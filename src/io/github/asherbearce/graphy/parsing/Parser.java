@@ -1,6 +1,8 @@
 package io.github.asherbearce.graphy.parsing;
 
 import io.github.asherbearce.graphy.exception.ParseException;
+import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
+import io.github.asherbearce.graphy.math.NumberValue;
 import io.github.asherbearce.graphy.token.IdentifierToken;
 import io.github.asherbearce.graphy.token.NumberToken;
 import io.github.asherbearce.graphy.token.OperatorTokens;
@@ -34,7 +36,6 @@ public class Parser extends TokenHandler {
 
       argNum++;
     }
-
 
     return args;
   }
@@ -117,6 +118,12 @@ public class Parser extends TokenHandler {
     }
   }
 
+  public static Expression fromNumber(NumberValue input){
+    LinkedList<Instruction> compiledInstructions = new LinkedList<>();
+    compiledInstructions.addLast(new Instruction(InstructionType.PUSH, input));
+    return new Expression(compiledInstructions);
+  }
+
   public Expression parseExpression() throws ParseException{
     LinkedList<Instruction> compiledInstructions = new LinkedList<>();
     parseExpression(compiledInstructions, 0);
@@ -124,6 +131,54 @@ public class Parser extends TokenHandler {
     for (Instruction instruction : compiledInstructions){
       instruction.setExpression(result);
     }
+    return result;
+  }
+
+  public Function parseFunction() throws ParseException{
+    Function result = new Function();
+
+    try{
+      //This is a named function.
+      expectToken(TokenTypes.IDENTIFIER);
+      String identifier = ((IdentifierToken)getCurrent()).getValue();
+      result.setIdentifier(identifier);
+      nextToken();
+      if (getCurrent().getTokenType() == TokenTypes.OPEN_PAREN){
+        //Declaring 1 or more arguments
+        LinkedList<String> args = new LinkedList<>();
+        nextToken();
+
+        while (getCurrent().getTokenType() == TokenTypes.IDENTIFIER){
+          args.addLast(((IdentifierToken)getCurrent()).getValue());
+          nextToken();
+          if (getCurrent().getTokenType() != TokenTypes.CLOSE_PAREN){
+            expectToken(TokenTypes.COMMA);
+            nextToken();
+          }
+        }
+        expectToken(TokenTypes.CLOSE_PAREN);
+
+        nextToken();
+        expectToken(TokenTypes.EQUALS);
+        nextToken();
+
+        result.setBody(parseExpression());
+        result.setupParameters(args.toArray(new String[0]));
+      }else{
+        //Declaring no arguments, declaring a variable.
+        expectToken(TokenTypes.EQUALS);
+        nextToken();
+        result.setBody(parseExpression());
+      }
+    } catch(ParseException e){
+      reset();
+      result = new Function();
+      Expression body = parseExpression();
+      result.setBody(body);
+      result.setupParameters(body.getVarNames());
+      result.setIdentifier(result.toString());//Give it a pretty much random name.
+    }
+
     return result;
   }
 }

@@ -2,6 +2,7 @@ package io.github.asherbearce.graphy.vm;
 
 import io.github.asherbearce.graphy.exception.ParseException;
 import io.github.asherbearce.graphy.math.NumberValue;
+import io.github.asherbearce.graphy.parsing.Parser;
 import java.util.HashMap;
 
 public class Function implements Invokable{
@@ -41,12 +42,32 @@ public class Function implements Invokable{
     this.body = body;
   }
 
+  public void setupParameters(String[] varNames){
+    parameters = new HashMap<>();
+    numArgs = varNames.length;
+
+    for(int i = 0; i < varNames.length; i++){
+      parameters.put(varNames[i], i);
+      final String varName = varNames[i];
+
+      body.setGetterMethod(varNames[i],
+          () -> assignedParams[parameters.get(varName)].evaluate()
+      );
+    }
+  }
+
   public NumberValue invoke(Expression... args) throws ParseException {
     assignedParams = args;
     return body.evaluate();
   }
 
   public NumberValue invoke(NumberValue... args) throws ParseException {
-    return null;//TODO Fix this
+    assignedParams = new Expression[args.length];
+
+    for (int i = 0; i < assignedParams.length; i++){
+      assignedParams[i] = Parser.fromNumber(args[i]);
+    }
+
+    return body.evaluate();
   }
 }

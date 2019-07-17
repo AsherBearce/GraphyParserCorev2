@@ -11,7 +11,7 @@ public class Expression {
   private LinkedList<Instruction> instructions;
   private HashMap<String, Getter> variables;
 
-  public NumberValue getVariable(String name){
+  public NumberValue getVariable(String name) throws ParseException{
     if (variables.containsKey(name)){
       return variables.get(name).get();
     }
@@ -45,6 +45,7 @@ public class Expression {
     Stack<NumberValue> virtualStack = new Stack<>();
 
     for (Instruction instruction : instructions){
+      System.out.println(instruction.getType());
       instruction.execute(virtualStack);
     }
 
@@ -52,6 +53,6 @@ public class Expression {
   }
 
   public interface Getter{
-    NumberValue get();
+    NumberValue get() throws ParseException;
   }
 }
