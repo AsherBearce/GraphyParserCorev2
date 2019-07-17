@@ -32,7 +32,7 @@ public class Dual implements NumberValue<Dual> {
   @Override
   public Dual pow(Dual rhs) {
     double factor = Math.pow(real, rhs.real);
-    return new Dual(factor, factor * rhs.dual * Math.log(real) + dual * rhs.real / real);
+    return new Dual(factor, factor * (rhs.dual * Math.log(real) + dual * rhs.real / real));
   }
 
   @Override

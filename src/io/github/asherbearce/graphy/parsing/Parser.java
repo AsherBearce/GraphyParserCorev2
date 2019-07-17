@@ -1,13 +1,12 @@
 package io.github.asherbearce.graphy.parsing;
 
 import io.github.asherbearce.graphy.exception.ParseException;
-import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
-import io.github.asherbearce.graphy.math.NumberValue;
 import io.github.asherbearce.graphy.token.IdentifierToken;
 import io.github.asherbearce.graphy.token.NumberToken;
 import io.github.asherbearce.graphy.token.OperatorTokens;
 import io.github.asherbearce.graphy.token.Token;
 import io.github.asherbearce.graphy.token.TokenTypes;
+import io.github.asherbearce.graphy.vm.Expression;
 import io.github.asherbearce.graphy.vm.Function;
 import io.github.asherbearce.graphy.vm.Instruction;
 import io.github.asherbearce.graphy.vm.Instruction.InstructionType;
@@ -15,22 +14,27 @@ import java.util.LinkedList;
 
 public class Parser extends TokenHandler {
 
-  private LinkedList<Instruction> compiledInstructions;
-
   public Parser(LinkedList<Token> tokens) {
     super(tokens);
-    compiledInstructions = new LinkedList<>();
   }
 
-  private NumberValue[] getArgs(Function func) throws ParseException {
+  private Expression[] getArgs(Function func) throws ParseException {
     int numArgs = func.getNumArgs();
-    NumberValue[] args = new NumberValue[numArgs];
+    Expression[] args = new Expression[numArgs];
     int argNum = 0;
 
     while (getCurrent().getTokenType() == TokenTypes.NUMBER ||
         getCurrent().getTokenType() == TokenTypes.IDENTIFIER) {
+      args[argNum] = parseExpression();
 
+      if (argNum < numArgs - 1){
+        expectToken(TokenTypes.COMMA);
+        nextToken();
+      }
+
+      argNum++;
     }
+
 
     return args;
   }
@@ -57,6 +61,7 @@ public class Parser extends TokenHandler {
     } else {
       String identifierName = ((IdentifierToken) getCurrent()).getValue();
       if (nextToken().getTokenType() == TokenTypes.OPEN_PAREN) {
+
         //Calling a function, Not sure how to handle this just yet
         //Also not sure how to handle built in functions just yet either
       } else {
@@ -112,5 +117,13 @@ public class Parser extends TokenHandler {
     }
   }
 
-  //TODO Test to make sure that this actually compiles correctly.
+  public Expression parseExpression() throws ParseException{
+    LinkedList<Instruction> compiledInstructions = new LinkedList<>();
+    parseExpression(compiledInstructions, 0);
+    Expression result = new Expression(compiledInstructions);
+    for (Instruction instruction : compiledInstructions){
+      instruction.setExpression(result);
+    }
+    return result;
+  }
 }

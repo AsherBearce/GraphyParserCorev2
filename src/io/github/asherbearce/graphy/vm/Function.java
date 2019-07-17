@@ -1,15 +1,17 @@
 package io.github.asherbearce.graphy.vm;
 
+import io.github.asherbearce.graphy.exception.ParseException;
 import io.github.asherbearce.graphy.math.NumberValue;
 import java.util.HashMap;
-import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
 
-public class Function {
+public class Function implements Invokable{
   private String identifier;
   private int numArgs;
   private HashMap<String, Integer> parameters;
   private Expression[] assignedParams;
   private ComputeEnvironment env;
+  private Expression body;
+  private Expression condition;
 
   public String getIdentifier() {
     return identifier;
@@ -35,21 +37,16 @@ public class Function {
     this.env = env;
   }
 
-  public NumberValue retrieveVariable(String identifier) throws UnkownIdentifierException{
-    NumberValue result;
-    if (parameters.containsKey(identifier)){
-     result = assignedParams[parameters.get(identifier)].evaluate();
-    } else if (getEnv().getFunction(identifier) != null &&
-        getEnv().getFunction(identifier).getNumArgs() == 0){
-      result = getEnv().getFunction(identifier).invoke();
-    }
-    else{
-      throw new UnkownIdentifierException("Unknown identifier: " + identifier);
-    }
-    return result;
+  public void setBody(Expression body){
+    this.body = body;
   }
 
-  public NumberValue invoke(NumberValue... args){
+  public NumberValue invoke(Expression... args) throws ParseException {
+    assignedParams = args;
+    return body.evaluate();
+  }
+
+  public NumberValue invoke(NumberValue... args) throws ParseException {
     return null;//TODO Fix this
   }
 }

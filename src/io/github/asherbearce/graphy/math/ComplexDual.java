@@ -83,8 +83,6 @@ public class ComplexDual implements NumberValue<ComplexDual> {
     return null;
   }
 
-
-
   @Override
   public Class<? extends NumberValue> enclosingType(Class<? extends NumberValue> clazz) {
     return ComplexDual.class;

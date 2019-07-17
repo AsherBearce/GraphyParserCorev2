@@ -3,6 +3,7 @@ package io.github.asherbearce.graphy.vm;
 import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
 import io.github.asherbearce.graphy.exception.ParseException;
 import io.github.asherbearce.graphy.math.NumberValue;
+import java.lang.reflect.Method;
 import java.util.Stack;
 
 public class Instruction {
@@ -23,7 +24,7 @@ public class Instruction {
   private final InstructionType instruction;
   private final Object[] args;
   private ComputeEnvironment env;
-  private Function caller;
+  private Expression exprContainer;
 
   public Instruction(InstructionType instruction, Object... args){
     this.instruction = instruction;
@@ -34,8 +35,32 @@ public class Instruction {
     this.env = env;
   }
 
-  public void setCaller(Function caller) {
-    this.caller = caller;
+  public void setExpression(Expression expression){
+    this.exprContainer = expression;
+  }
+
+  public Object getArg(int index){
+    return args[index];
+  }
+
+  public InstructionType getType(){
+    return this.instruction;
+  }
+
+  private NumberValue convertToCompatibleTypes(NumberValue a, NumberValue b){
+    Class<? extends NumberValue> aClass = a.getClass();
+    Class<? extends NumberValue> bClass = b.getClass();
+    Class<? extends NumberValue> enclosing = a.enclosingType(bClass);
+
+    try{
+      Method aConverter = enclosing.getMethod("from", aClass);
+
+      return (NumberValue)aConverter.invoke(null, a);
+    }
+    catch(ReflectiveOperationException e){
+      //Do nothing
+      return null;
+    }
   }
 
   public void execute(Stack<NumberValue> stack) throws ParseException {
@@ -49,18 +74,17 @@ public class Instruction {
         break;
       }
       case GET:{
-        stack.push(caller.retrieveVariable((String)args[0]));
+        stack.push(exprContainer.getVariable((String)args[0]));
         break;
       }
       case CALL:{
-        //IMPORTANT!! PUSH PARAMETERS ONTO THE STACK IN REVERSE ORDER!!!
         String identifier = (String)args[0];
         Function func = env.getFunction(identifier);
         if (func != null){
-          NumberValue[] functionArguments = new NumberValue[func.getNumArgs()];
+          Expression[] functionArguments = new Expression[func.getNumArgs()];
 
           for (int i = 0; i < functionArguments.length; i++){
-            functionArguments[i] = stack.pop();
+            functionArguments[i] = (Expression)args[i + 1];
           }
 
           stack.push(func.invoke(functionArguments));
@@ -73,31 +97,46 @@ public class Instruction {
       case ADD:{
         NumberValue a = stack.pop();
         NumberValue b = stack.pop();
-        stack.push(a.add(b));
+        a = convertToCompatibleTypes(a, b);
+        b = convertToCompatibleTypes(b, a);
+
+        stack.push(b.add(a));
         break;
       }
       case SUB:{
         NumberValue a = stack.pop();
         NumberValue b = stack.pop();
-        stack.push(a.sub(b));
+        a = convertToCompatibleTypes(a, b);
+        b = convertToCompatibleTypes(b, a);
+
+        stack.push(b.sub(a));
         break;
       }
       case MUL:{
         NumberValue a = stack.pop();
         NumberValue b = stack.pop();
-        stack.push(a.mul(b));
+        a = convertToCompatibleTypes(a, b);
+        b = convertToCompatibleTypes(b, a);
+
+        stack.push(b.mul(a));
         break;
       }
       case DIV:{
         NumberValue a = stack.pop();
         NumberValue b = stack.pop();
-        stack.push(a.div(b));
+        a = convertToCompatibleTypes(a, b);
+        b = convertToCompatibleTypes(b, a);
+
+        stack.push(b.div(a));
         break;
       }
       case POW:{
         NumberValue a = stack.pop();
         NumberValue b = stack.pop();
-        stack.push(a.pow(b));
+        a = convertToCompatibleTypes(a, b);
+        b = convertToCompatibleTypes(b, a);
+
+        stack.push(b.pow(a));
         break;
       }
       case NEG:{
