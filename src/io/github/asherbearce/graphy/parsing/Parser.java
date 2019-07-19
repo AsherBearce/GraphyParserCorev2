@@ -42,6 +42,8 @@ public class Parser extends TokenHandler {
 
       argNum++;
     }
+    expectToken(TokenTypes.CLOSE_PAREN);
+    nextToken();
 
     return args;
   }
