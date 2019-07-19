@@ -29,6 +29,7 @@ public class Instruction {
   public Instruction(InstructionType instruction, Object... args){
     this.instruction = instruction;
     this.args = args;
+    env = ComputeEnvironment.getInstance();
   }
 
   public void setEnv(ComputeEnvironment env) {
@@ -41,6 +42,10 @@ public class Instruction {
 
   public Object getArg(int index){
     return args[index];
+  }
+
+  public Object[] getArgs(){
+    return args;
   }
 
   public InstructionType getType(){
@@ -79,7 +84,7 @@ public class Instruction {
       }
       case CALL:{
         String identifier = (String)args[0];
-        Function func = env.getFunction(identifier);
+        Invokable func = env.getFunction(identifier);
         if (func != null){
           Expression[] functionArguments = new Expression[func.getNumArgs()];
 

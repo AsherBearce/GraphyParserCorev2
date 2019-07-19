@@ -1,31 +1,37 @@
 package io.github.asherbearce.graphy.vm;
 
+import io.github.asherbearce.graphy.exception.ParseException;
+import io.github.asherbearce.graphy.math.NumberValue;
 import java.util.HashMap;
 
 public class ComputeEnvironment {
 
-  private HashMap<String, Function> functions;
-  //public static HashMap<String, BuiltInMethods> builtIn;
+  private HashMap<String, Invokable> functions;
+  private HashMap<String, Invokable> builtIn;
+  private static ComputeEnvironment instance;
 
-  public ComputeEnvironment() {
+  private ComputeEnvironment() {
     functions = new HashMap<>();
+    builtIn = new HashMap<>();
   }
 
-  /*static{
-    builtIn = new HashMap<>();
-    builtIn.put("ln", BuiltInMethods.LOG);
-    builtIn.put("log10", BuiltInMethods.LOG_10);
-    builtIn.put("cos", BuiltInMethods.COS);
-    builtIn.put("sin", BuiltInMethods.SIN);
-    builtIn.put("tan", BuiltInMethods.TAN);
-  }*/
+  public static ComputeEnvironment getInstance(){
+    if (instance == null){
+      instance = new ComputeEnvironment();
+    }
 
-  public Function getFunction(String identifier) {
-    Function result;
+    return instance;
+  }
+
+  public Invokable getFunction(String identifier) {
+    Invokable result;
 
     if (functions.containsKey(identifier)) {
       result = functions.get(identifier);
-    } else {
+    } else if (builtIn.containsKey(identifier)){
+      result = builtIn.get(identifier);
+    }
+    else{
       result = null;
     }
 
@@ -37,7 +43,6 @@ public class ComputeEnvironment {
     if (functions.containsKey(identifier)) {
       functions.remove(identifier);
     }
-    newFunction.setEnv(this);
     functions.put(identifier, newFunction);
   }
 

@@ -11,6 +11,32 @@ public class Expression {
   private LinkedList<Instruction> instructions;
   private HashMap<String, Getter> variables;
 
+  private void setupLowerVariables(HashMap<String, Getter> vars){
+    instructions.forEach(
+        (instruction) -> {
+          if (instruction.getType() == InstructionType.GET){
+            String varName = (String)instruction.getArg(0);
+            boolean globalVarsContainsKey = vars.containsKey(varName);
+            boolean exprVarsContainsKey = this.variables.containsKey(varName);
+
+            if (!globalVarsContainsKey) {
+              vars.put(varName, () -> null);
+            }
+            if (!exprVarsContainsKey){
+              variables.put(varName, () -> vars.get(varName).get());
+            }
+
+          } else if (instruction.getType() == InstructionType.CALL){
+            Object[] args = instruction.getArgs();
+            for (int i = 1; i < args.length; i++){
+              ((Expression)args[i]).setupLowerVariables(vars);
+            }
+          }
+
+        }
+    );
+  }
+
   public NumberValue getVariable(String name) throws ParseException{
     if (variables.containsKey(name)){
       return variables.get(name).get();
@@ -27,14 +53,12 @@ public class Expression {
   public Expression(LinkedList<Instruction> instructions){
     this.instructions = instructions;
     variables = new HashMap<>();
-    //Automatically populate variables
-    instructions.forEach(
-        (instruction) -> {
-          if (instruction.getType() == InstructionType.GET){
-            variables.put((String)instruction.getArg(0), null);
-          }
-        }
-    );
+  }
+
+  public void populateVars(){
+    HashMap<String, Getter> vars = new HashMap<>();
+    setupLowerVariables(vars);
+    variables = vars;
   }
 
   public void setGetterMethod(String name, Getter newGetter){
@@ -45,7 +69,6 @@ public class Expression {
     Stack<NumberValue> virtualStack = new Stack<>();
 
     for (Instruction instruction : instructions){
-      System.out.println(instruction.getType());
       instruction.execute(virtualStack);
     }
 

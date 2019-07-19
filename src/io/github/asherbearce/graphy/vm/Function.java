@@ -14,6 +14,10 @@ public class Function implements Invokable{
   private Expression body;
   private Expression condition;
 
+  public Function(){
+    env = ComputeEnvironment.getInstance();
+  }
+
   public String getIdentifier() {
     return identifier;
   }
@@ -28,14 +32,6 @@ public class Function implements Invokable{
 
   public void setNumArgs(int numArgs) {
     this.numArgs = numArgs;
-  }
-
-  public ComputeEnvironment getEnv() {
-    return env;
-  }
-
-  public void setEnv(ComputeEnvironment env) {
-    this.env = env;
   }
 
   public void setBody(Expression body){

@@ -8,22 +8,28 @@ import io.github.asherbearce.graphy.token.NumberToken;
 import io.github.asherbearce.graphy.token.OperatorTokens;
 import io.github.asherbearce.graphy.token.Token;
 import io.github.asherbearce.graphy.token.TokenTypes;
+import io.github.asherbearce.graphy.vm.ComputeEnvironment;
 import io.github.asherbearce.graphy.vm.Expression;
 import io.github.asherbearce.graphy.vm.Function;
 import io.github.asherbearce.graphy.vm.Instruction;
 import io.github.asherbearce.graphy.vm.Instruction.InstructionType;
+import io.github.asherbearce.graphy.vm.Invokable;
 import java.util.LinkedList;
 
 public class Parser extends TokenHandler {
 
-  public Parser(LinkedList<Token> tokens) {
+  private ComputeEnvironment env;
+  public Parser(LinkedList<Token> tokens, ComputeEnvironment env) {
     super(tokens);
+    this.env = env;
   }
 
-  private Expression[] getArgs(Function func) throws ParseException {
+
+  private Expression[] getArgs(Invokable func) throws ParseException {
     int numArgs = func.getNumArgs();
     Expression[] args = new Expression[numArgs];
     int argNum = 0;
+    nextToken();
 
     while (getCurrent().getTokenType() == TokenTypes.NUMBER ||
         getCurrent().getTokenType() == TokenTypes.IDENTIFIER) {
@@ -62,9 +68,21 @@ public class Parser extends TokenHandler {
     } else {
       String identifierName = ((IdentifierToken) getCurrent()).getValue();
       if (nextToken().getTokenType() == TokenTypes.OPEN_PAREN) {
+        //Calling a function
+        Invokable func = env.getFunction(identifierName);
+        if (func == null){
+          throw new UnkownIdentifierException("Unknown identifier: " + identifierName);
+        }
+        Expression[] exprAgs = getArgs(func);
+        Object[] args = new Object[exprAgs.length + 1];
+        args[0] = identifierName;
 
-        //Calling a function, Not sure how to handle this just yet
-        //Also not sure how to handle built in functions just yet either
+        for (int i = 1; i < args.length; i++){
+          args[i] = exprAgs[i - 1];
+        }
+        instructions.addLast(new Instruction(
+            InstructionType.CALL, args
+        ));
       } else {
         //Referencing a variable
         instructions.addLast(new Instruction(InstructionType.GET, identifierName));
@@ -161,19 +179,23 @@ public class Parser extends TokenHandler {
         nextToken();
         expectToken(TokenTypes.EQUALS);
         nextToken();
-
-        result.setBody(parseExpression());
+        Expression body = parseExpression();
+        body.populateVars();
+        result.setBody(body);
         result.setupParameters(args.toArray(new String[0]));
       }else{
         //Declaring no arguments, declaring a variable.
         expectToken(TokenTypes.EQUALS);
         nextToken();
-        result.setBody(parseExpression());
+        Expression body = parseExpression();
+        body.populateVars();
+        result.setBody(body);
       }
     } catch(ParseException e){
       reset();
       result = new Function();
       Expression body = parseExpression();
+      body.populateVars();
       result.setBody(body);
       result.setupParameters(body.getVarNames());
       result.setIdentifier(result.toString());//Give it a pretty much random name.
