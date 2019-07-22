@@ -6,6 +6,10 @@ import io.github.asherbearce.graphy.math.MathUtil;
 import io.github.asherbearce.graphy.math.NumberValue;
 import java.util.HashMap;
 
+/**
+ * A singleton class that handles storing and manipulating all {@link Function} objects that are
+ * parsed from {@link io.github.asherbearce.graphy.parsing.Parser}
+ */
 public class ComputeEnvironment {
 
   private HashMap<String, Invokable> functions;
@@ -66,6 +70,10 @@ public class ComputeEnvironment {
 
   }
 
+  /**
+   * Returns the single instance of this class
+   * @return {@link ComputeEnvironment}
+   */
   public static ComputeEnvironment getInstance(){
     if (instance == null){
       instance = new ComputeEnvironment();
@@ -74,6 +82,12 @@ public class ComputeEnvironment {
     return instance;
   }
 
+  /**
+   * Returns a {@link Invokable} given an {@link String} Identifier
+   * @param identifier The name of the {@link Invokable} to be found.
+   * @return {@link Invokable} or null if there is no {@link Invokable} associated with the
+   * given identifier.
+   */
   public Invokable getFunction(String identifier) {
     Invokable result;
 
@@ -89,6 +103,10 @@ public class ComputeEnvironment {
     return result;
   }
 
+  /**
+   * Adds a new {@link Function} into the collection of Functions.
+   * @param newFunction The {@link Function} to be added to the collection.
+   */
   public void putFunction(Function newFunction) {
     String identifier = newFunction.getIdentifier();
     if (functions.containsKey(identifier)) {
@@ -97,6 +115,9 @@ public class ComputeEnvironment {
     functions.put(identifier, newFunction);
   }
 
+  /**
+   * Clears all {@link Invokable} from the collection of functions.
+   */
   public void clearContent() {
     functions.clear();
   }

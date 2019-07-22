@@ -9,6 +9,8 @@ import io.github.asherbearce.graphy.vm.ComputeEnvironment;
 import io.github.asherbearce.graphy.vm.Function;
 import java.util.LinkedList;
 
+//~1600 lines of code
+
 public class ParseTest {
 
   public static void main(String[] args) throws ParseException {
@@ -20,7 +22,7 @@ public class ParseTest {
     Function test = new Parser(tokens, env).parseFunction();
     env.putFunction(test);
 
-    String toParse = "g(y) = derivative(f(y), y, y)";
+    String toParse = "g(x) = derivative(f(x), x, x)";
     Tokenizer tokenizer1 = new Tokenizer(toParse);
     LinkedList<Token> tokens1 = tokenizer1.Tokenize();
     Function test1 = new Parser(tokens1, env).parseFunction();

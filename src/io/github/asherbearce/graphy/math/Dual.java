@@ -1,9 +1,17 @@
 package io.github.asherbearce.graphy.math;
 
+/**
+ * A class that models the Dual number system.
+ */
 public class Dual implements NumberValue<Dual> {
   private final double real;
   private final double dual;
 
+  /**
+   * Constructs a new dual number from a real value and a dual value.
+   * @param real The real part of this dual number
+   * @param dual The dual part of this dual number
+   */
   public Dual(double real, double dual){
     this.real = real;
     this.dual = dual;

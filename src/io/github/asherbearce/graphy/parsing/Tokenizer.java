@@ -8,12 +8,19 @@ import io.github.asherbearce.graphy.token.Token;
 import io.github.asherbearce.graphy.token.TokenTypes;
 import java.util.LinkedList;
 
-//TODO add identifiers and complex numbers to the tokenizing process
+//TODO add complex numbers to the tokenizing process
 
+/**
+ * A class that turns a raw {@link String} input into a List of {@link Token}
+ */
 public final class Tokenizer {
   private final String toTokenize;
   private int currentIndex;
 
+  /**
+   * Creates a new Tokenizer given a raw {@link String} input
+   * @param rawString
+   */
   public Tokenizer(String rawString){
     toTokenize = rawString;
   }
@@ -28,6 +35,10 @@ public final class Tokenizer {
     return currentIndex < toTokenize.length();
   }
 
+  /**
+   * Turns the raw string input into a list of Tokens.
+   * @return {@link LinkedList}
+   */
   public LinkedList<Token> Tokenize(){
     LinkedList<Token> result = new LinkedList<>();
     char currentCharacter = toTokenize.charAt(0);

@@ -1,7 +1,7 @@
 package io.github.asherbearce.graphy.parsing;
 
 import io.github.asherbearce.graphy.exception.ParseException;
-import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
+import io.github.asherbearce.graphy.exception.UnknownIdentifierException;
 import io.github.asherbearce.graphy.math.NumberValue;
 import io.github.asherbearce.graphy.token.IdentifierToken;
 import io.github.asherbearce.graphy.token.NumberToken;
@@ -16,14 +16,21 @@ import io.github.asherbearce.graphy.vm.Instruction.InstructionType;
 import io.github.asherbearce.graphy.vm.Invokable;
 import java.util.LinkedList;
 
+/**
+ * A class that parses tokens into Expressions and Functions.
+ */
 public class Parser extends TokenHandler {
-
   private ComputeEnvironment env;
+
+  /**
+   * Constructs a new Parser object from a list of {@link Token} and {@link ComputeEnvironment}
+   * @param tokens The list of tokens to be parsed
+   * @param env The ComputeEnvironment
+   */
   public Parser(LinkedList<Token> tokens, ComputeEnvironment env) {
     super(tokens);
     this.env = env;
   }
-
 
   private Expression[] getArgs(Invokable func) throws ParseException {
     int numArgs = func.getNumArgs();
@@ -73,7 +80,7 @@ public class Parser extends TokenHandler {
         //Calling a function
         Invokable func = env.getFunction(identifierName);
         if (func == null){
-          throw new UnkownIdentifierException("Unknown identifier: " + identifierName);
+          throw new UnknownIdentifierException("Unknown identifier: " + identifierName);
         }
         Expression[] exprAgs = getArgs(func);
         Object[] args = new Object[exprAgs.length + 1];
@@ -92,7 +99,7 @@ public class Parser extends TokenHandler {
     }
   }
 
-  public void parseExpression(LinkedList<Instruction> instructions, int minPrecedence)
+  private void parseExpression(LinkedList<Instruction> instructions, int minPrecedence)
       throws ParseException{
     parseAtom(instructions);
 
@@ -138,13 +145,18 @@ public class Parser extends TokenHandler {
     }
   }
 
+  /**
+   * Constructs an expression from a single {@link NumberValue} input.
+   * @param input The number from which an {@link Expression} should be parsed
+   * @return
+   */
   public static Expression fromNumber(NumberValue input){
     LinkedList<Instruction> compiledInstructions = new LinkedList<>();
     compiledInstructions.addLast(new Instruction(InstructionType.PUSH, input));
     return new Expression(compiledInstructions);
   }
 
-  public Expression parseExpression() throws ParseException{
+  private Expression parseExpression() throws ParseException{
     LinkedList<Instruction> compiledInstructions = new LinkedList<>();
     parseExpression(compiledInstructions, 0);
     Expression result = new Expression(compiledInstructions);
@@ -154,6 +166,11 @@ public class Parser extends TokenHandler {
     return result;
   }
 
+  /**
+   * Parses a new function from a list of {@link Token}.
+   * @return {@link Function}
+   * @throws ParseException
+   */
   public Function parseFunction() throws ParseException{
     Function result = new Function();
 

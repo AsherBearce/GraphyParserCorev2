@@ -1,10 +1,18 @@
 package io.github.asherbearce.graphy.math;
 
+/**
+ * A class that models the complex number system.
+ */
 public class Complex implements NumberValue<Complex> {
 
   private final double real;
   private final double imaginary;
 
+  /**
+   * Constructs a new complex number from a real value and an imaginary value.
+   * @param real The real part of this complex number
+   * @param imaginary The imaginary part of this complex number
+   */
   public Complex(double real, double imaginary){
     this.real = real;
     this.imaginary = imaginary;
@@ -94,10 +102,20 @@ public class Complex implements NumberValue<Complex> {
     return String.format("%f + i%f", real().getValue(), imaginary().getValue());
   }
 
+  /**
+   * Constructs a new complex number given a {@link Real} number
+   * @param real The Real number to construct the complex number from
+   * @return
+   */
   public static Complex from(Real real){
     return new Complex(real.getValue(), 0);
   }
 
+  /**
+   * Constructs a new complex number given a complex number.
+   * @param value The complex number to construct the new complex number from.
+   * @return
+   */
   public static Complex from(Complex value){
     return value;
   }

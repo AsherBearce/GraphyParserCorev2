@@ -1,5 +1,8 @@
 package io.github.asherbearce.graphy.token;
 
+/**
+ * An enum that lists all possible types of Tokens allowed.
+ */
 public enum TokenTypes implements Token {
   NUMBER,
   IDENTIFIER,
@@ -13,8 +16,6 @@ public enum TokenTypes implements Token {
   EQUALS,
   LESS_THAN,
   GREATER_THAN,
-  LESS_THAN_EQUAL,
-  GREATER_THAN_EQUAL,
   END;
 
   @Override

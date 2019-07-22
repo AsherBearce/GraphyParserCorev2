@@ -1,12 +1,21 @@
 package io.github.asherbearce.graphy.math;
 
+/**
+ * A class that combines the functionality of {@link Complex} and {@link Dual}.
+ */
 public class ComplexDual implements NumberValue<ComplexDual> {
-  //Quick note, this is viewed as being a + bi where a, b are dual numbers.
   private final double real;
   private final double dual;
   private final double imaginary;
   private final double imaginaryDual;
 
+  /**
+   * Creates a new ComplexDual type given four real values.
+   * @param real The real part of this complexdual number.
+   * @param dual The dual part of this complexdual number.
+   * @param imaginary The imaginary part of this complexdual number.
+   * @param imaginaryDual The imaginary-dual part of this complexdual number.
+   */
   public ComplexDual(double real, double dual, double imaginary, double imaginaryDual){
     this.real = real;
     this.dual = dual;

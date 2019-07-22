@@ -1,13 +1,24 @@
 package io.github.asherbearce.graphy.math;
 
+/**
+ * A class that models Real numbers.
+ */
 public class Real implements NumberValue<Real> {
 
   private final double value;
 
+  /**
+   * Constructs a new Real number given a number.
+   * @param value The number to construct the real number from
+   */
   public Real(double value){
     this.value = value;
   }
 
+  /**
+   * Retrieves the double value of this real number.
+   * @return {@link double}
+   */
   public double getValue(){
     return value;
   }
@@ -91,6 +102,11 @@ public class Real implements NumberValue<Real> {
     return String.format("%f", value);
   }
 
+  /**
+   * Constructs a new Real number from a Real number.
+   * @param value
+   * @return {@link Real}
+   */
   public static Real from(Real value) {
     return value;
   }

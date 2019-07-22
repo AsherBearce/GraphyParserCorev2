@@ -1,5 +1,8 @@
 package io.github.asherbearce.graphy.token;
 
+/**
+ * An enum which specifies all possible operator tokens. Some operators can also be unary.
+ */
 public enum OperatorTokens implements Operator, Token {
   PLUS(1, true),
   MINUS(1, true),

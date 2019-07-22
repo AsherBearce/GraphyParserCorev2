@@ -1,12 +1,19 @@
 package io.github.asherbearce.graphy.vm;
 
-import io.github.asherbearce.graphy.exception.UnkownIdentifierException;
+import io.github.asherbearce.graphy.exception.UnknownIdentifierException;
 import io.github.asherbearce.graphy.exception.ParseException;
 import io.github.asherbearce.graphy.math.NumberValue;
 import java.lang.reflect.Method;
 import java.util.Stack;
 
+/**
+ * A class for containing all the possible instructions that can be executed.
+ */
 public class Instruction {
+
+  /**
+   * A simple enum for listing all possible instruction types.
+   */
   public enum InstructionType{
     PUSH,
     POP,
@@ -26,32 +33,58 @@ public class Instruction {
   private ComputeEnvironment env;
   private Expression exprContainer;
 
+  /**
+   * Constructs a new Instruction object given the instruction type and the arguments that
+   * correspond to that instruction.
+   * @param instruction The enum instruction type
+   * @param args The arguments that correspond to the instruction type.
+   */
   public Instruction(InstructionType instruction, Object... args){
     this.instruction = instruction;
     this.args = args;
     env = ComputeEnvironment.getInstance();
   }
 
-  public void setEnv(ComputeEnvironment env) {
-    this.env = env;
-  }
-
+  /**
+   * Sets the current {@link Expression} holder of this Instruction.
+   * @param expression The new {@link Expression} holder to be assigned.
+   */
   public void setExpression(Expression expression){
     this.exprContainer = expression;
   }
 
+  /**
+   * Returns the argument at a given index of this instruction.
+   * @param index The index of the argument to be returned.
+   * @return {@link Object}
+   */
   public Object getArg(int index){
     return args[index];
   }
 
+  /**
+   * Returns the entire array of arguments being used by this instruction
+   * @return Object[]
+   */
   public Object[] getArgs(){
     return args;
   }
 
+  /**
+   * Retrieves the type of this instruction.
+   * @return {@link InstructionType}
+   */
   public InstructionType getType(){
     return this.instruction;
   }
 
+  /**
+   * Converts one {@link NumberValue} to the enclosing subclass of {@link NumberValue} so
+   * mathematical operations can be performed on them
+   * @param a The {@link NumberValue} to be converted
+   * @param b The other {@link NumberValue} to determine the enclosing class of both a and b.
+   * @return {@link NumberValue}
+   */
   private NumberValue convertToCompatibleTypes(NumberValue a, NumberValue b){
     Class<? extends NumberValue> aClass = a.getClass();
     Class<? extends NumberValue> bClass = b.getClass();
@@ -68,6 +101,11 @@ public class Instruction {
     }
   }
 
+  /**
+   * Executes this instruction given a stack to operate on.
+   * @param stack The stack to be used in executing this instruction
+   * @throws ParseException
+   */
   public void execute(Stack<NumberValue> stack) throws ParseException {
     switch (instruction){
       case PUSH:{
@@ -80,6 +118,7 @@ public class Instruction {
       }
       case GET:{
         stack.push(exprContainer.getVariable((String)args[0]));
+        System.out.println(stack.peek().toString());
         break;
       }
       case CALL:{
@@ -95,7 +134,7 @@ public class Instruction {
           stack.push(func.invoke(functionArguments));
         }
         else{
-          throw new UnkownIdentifierException("Unknown identifier: " + identifier);
+          throw new UnknownIdentifierException("Unknown identifier: " + identifier);
         }
         break;
       }
