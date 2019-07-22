@@ -12,6 +12,7 @@ import java.util.HashMap;
  */
 public class ComputeEnvironment {
 
+  private static int integralResolution;
   private HashMap<String, Invokable> functions;
   private HashMap<String, Invokable> builtIn;
   private static ComputeEnvironment instance;
@@ -41,6 +42,94 @@ public class ComputeEnvironment {
             return MathUtil.log(args[0]);
           }
         });
+    builtIn.put("log",
+        new Invokable() {
+          @Override
+          public String getIdentifier() {
+            return "log";
+          }
+
+          @Override
+          public int getNumArgs() {
+            return 1;
+          }
+
+          @Override
+          public NumberValue invoke(Expression... args) throws ParseException {
+            return MathUtil.log10(args[0].evaluate());
+          }
+
+          @Override
+          public NumberValue invoke(NumberValue... args) throws ParseException {
+            return MathUtil.log10(args[0]);
+          }
+        });
+    builtIn.put("cos",
+        new Invokable() {
+          @Override
+          public String getIdentifier() {
+            return "cos";
+          }
+
+          @Override
+          public int getNumArgs() {
+            return 1;
+          }
+
+          @Override
+          public NumberValue invoke(Expression... args) throws ParseException {
+            return MathUtil.cos(args[0].evaluate());
+          }
+
+          @Override
+          public NumberValue invoke(NumberValue... args) throws ParseException {
+            return MathUtil.cos(args[0]);
+          }
+        });
+    builtIn.put("sin",
+        new Invokable() {
+          @Override
+          public String getIdentifier() {
+            return "sin";
+          }
+
+          @Override
+          public int getNumArgs() {
+            return 1;
+          }
+
+          @Override
+          public NumberValue invoke(Expression... args) throws ParseException {
+            return MathUtil.sin(args[0].evaluate());
+          }
+
+          @Override
+          public NumberValue invoke(NumberValue... args) throws ParseException {
+            return MathUtil.sin(args[0]);
+          }
+        });
+    builtIn.put("tan",
+        new Invokable() {
+          @Override
+          public String getIdentifier() {
+            return "tan";
+          }
+
+          @Override
+          public int getNumArgs() {
+            return 1;
+          }
+
+          @Override
+          public NumberValue invoke(Expression... args) throws ParseException {
+            return MathUtil.tan(args[0].evaluate());
+          }
+
+          @Override
+          public NumberValue invoke(NumberValue... args) throws ParseException {
+            return MathUtil.tan(args[0]);
+          }
+        });
     builtIn.put("derivative",
         new Invokable() {
           @Override
@@ -67,7 +156,6 @@ public class ComputeEnvironment {
             return null;
           }
         });
-
   }
 
   /**

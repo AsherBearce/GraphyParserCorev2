@@ -32,7 +32,7 @@ public class Expression {
           } else if (instruction.getType() == InstructionType.CALL){
             Object[] args = instruction.getArgs();
             for (int i = 1; i < args.length; i++){
-              ((Expression)args[i]).setupLowerVariables(vars);
+              ((Expression)args[i]).setupLowerVariables(variables);
             }
           }
 
@@ -76,9 +76,7 @@ public class Expression {
    * Sets up all variable identifiers from the set of instructions.
    */
   public void populateVars(){
-    HashMap<String, Getter> vars = new HashMap<>();
-    setupLowerVariables(vars);
-    variables = vars;
+    setupLowerVariables(variables);
   }
 
   /**

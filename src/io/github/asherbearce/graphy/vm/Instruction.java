@@ -118,7 +118,6 @@ public class Instruction {
       }
       case GET:{
         stack.push(exprContainer.getVariable((String)args[0]));
-        System.out.println(stack.peek().toString());
         break;
       }
       case CALL:{
