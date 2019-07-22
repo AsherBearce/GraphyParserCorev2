@@ -1,6 +1,7 @@
 package io.github.asherbearce.graphy.parsing;
 
 import io.github.asherbearce.graphy.exception.ParseException;
+import io.github.asherbearce.graphy.exception.UnexpectedTokenException;
 import io.github.asherbearce.graphy.exception.UnknownIdentifierException;
 import io.github.asherbearce.graphy.math.NumberValue;
 import io.github.asherbearce.graphy.token.IdentifierToken;
@@ -14,6 +15,7 @@ import io.github.asherbearce.graphy.vm.Function;
 import io.github.asherbearce.graphy.vm.Instruction;
 import io.github.asherbearce.graphy.vm.Instruction.InstructionType;
 import io.github.asherbearce.graphy.vm.Invokable;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -25,11 +27,10 @@ public class Parser extends TokenHandler {
   /**
    * Constructs a new Parser object from a list of {@link Token} and {@link ComputeEnvironment}
    * @param tokens The list of tokens to be parsed
-   * @param env The ComputeEnvironment
    */
-  public Parser(LinkedList<Token> tokens, ComputeEnvironment env) {
+  public Parser(LinkedList<Token> tokens) {
     super(tokens);
-    this.env = env;
+    this.env = ComputeEnvironment.getInstance();
   }
 
   private Expression[] getArgs(Invokable func) throws ParseException {
@@ -74,7 +75,7 @@ public class Parser extends TokenHandler {
       } else if (op == OperatorTokens.MULTIPLY) {
         instructions.addLast(new Instruction(InstructionType.CONJ));
       }
-    } else {
+    } else if(thisTokenType == TokenTypes.IDENTIFIER) {
       String identifierName = ((IdentifierToken) getCurrent()).getValue();
       if (nextToken().getTokenType() == TokenTypes.OPEN_PAREN) {
         //Calling a function
@@ -96,6 +97,10 @@ public class Parser extends TokenHandler {
         //Referencing a variable
         instructions.addLast(new Instruction(InstructionType.GET, identifierName));
       }
+    }
+    else {
+      throw new UnexpectedTokenException("Unexpected token, expected number or identifier, got "
+          + thisTokenType);
     }
   }
 
@@ -195,11 +200,18 @@ public class Parser extends TokenHandler {
         }
         expectToken(TokenTypes.CLOSE_PAREN);
 
+        String[] argsArray = args.toArray(new String[0]);
+
         nextToken();
         expectToken(TokenTypes.EQUALS);
         nextToken();
         Expression body = parseExpression();
         body.populateVars();
+
+        if (!Arrays.deepEquals(argsArray, body.getVarNames())){
+          throw new ParseException("Arguments do not match detected variables");
+        }
+
         result.setBody(body);
         result.setupParameters(args.toArray(new String[0]));
       }else{

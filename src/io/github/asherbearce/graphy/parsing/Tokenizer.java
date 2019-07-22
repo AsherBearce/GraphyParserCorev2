@@ -1,5 +1,6 @@
 package io.github.asherbearce.graphy.parsing;
 
+import io.github.asherbearce.graphy.exception.UnknownTokenException;
 import io.github.asherbearce.graphy.math.Real;
 import io.github.asherbearce.graphy.token.IdentifierToken;
 import io.github.asherbearce.graphy.token.NumberToken;
@@ -39,7 +40,7 @@ public final class Tokenizer {
    * Turns the raw string input into a list of Tokens.
    * @return {@link LinkedList}
    */
-  public LinkedList<Token> Tokenize(){
+  public LinkedList<Token> Tokenize() throws UnknownTokenException{
     LinkedList<Token> result = new LinkedList<>();
     char currentCharacter = toTokenize.charAt(0);
 
@@ -121,6 +122,9 @@ public final class Tokenizer {
           break;
         }
         default: {
+          if (!Character.isAlphabetic(currentCharacter)){
+            throw new UnknownTokenException("Bad character");
+          }
           int charCount = 0;
 
           while (hasNext() && Character.isAlphabetic(currentCharacter)){
